@@ -9,6 +9,8 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -1243,7 +1245,7 @@ fun ScoringInterface(
         if (showWideDialog) {
             Dialog(onDismissRequest = { showWideDialog = false }) {
                 Card(
-                    modifier = Modifier.fillMaxWidth().padding(16.dp),
+                    modifier = Modifier.fillMaxWidth().padding(16.dp).heightIn(max = 500.dp),
                     shape = RoundedCornerShape(16.dp),
                     colors = CardDefaults.cardColors(
                         containerColor = MaterialTheme.colorScheme.surface,
@@ -1251,7 +1253,9 @@ fun ScoringInterface(
                     )
                 ) {
                     Column(
-                        modifier = Modifier.padding(16.dp),
+                        modifier = Modifier
+                            .padding(16.dp)
+                            .verticalScroll(rememberScrollState()),
                         verticalArrangement = Arrangement.spacedBy(10.dp),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
@@ -1263,7 +1267,9 @@ fun ScoringInterface(
                             "1 run (2 Wds total)" to 1,
                             "2 runs (3 Wds total)" to 2,
                             "3 runs (4 Wds total)" to 3,
-                            "4 runs (Boundary) (5 Wds total)" to 4
+                            "4 runs (FOUR!) (5 Wds total)" to 4,
+                            "5 runs (6 Wds total)" to 5,
+                            "6 runs (SIXR!) (7 Wds total)" to 6
                         )
 
                         choices.forEach { (label, runs) ->
@@ -1291,7 +1297,7 @@ fun ScoringInterface(
         if (showNoBallDialog) {
             Dialog(onDismissRequest = { showNoBallDialog = false }) {
                 Card(
-                    modifier = Modifier.fillMaxWidth().padding(16.dp),
+                    modifier = Modifier.fillMaxWidth().padding(16.dp).heightIn(max = 500.dp),
                     shape = RoundedCornerShape(16.dp),
                     colors = CardDefaults.cardColors(
                         containerColor = MaterialTheme.colorScheme.surface,
@@ -1299,7 +1305,9 @@ fun ScoringInterface(
                     )
                 ) {
                     Column(
-                        modifier = Modifier.padding(16.dp),
+                        modifier = Modifier
+                            .padding(16.dp)
+                            .verticalScroll(rememberScrollState()),
                         verticalArrangement = Arrangement.spacedBy(10.dp),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
@@ -1312,6 +1320,7 @@ fun ScoringInterface(
                             "2 runs (3 runs total)" to 2,
                             "3 runs (4 runs total)" to 3,
                             "4 Runs (FOUR!)" to 4,
+                            "5 Runs (5 runs total)" to 5,
                             "6 Runs (SIXR!)" to 6
                         )
 
@@ -1340,7 +1349,7 @@ fun ScoringInterface(
         if (showByeDialog) {
             Dialog(onDismissRequest = { showByeDialog = false }) {
                 Card(
-                    modifier = Modifier.fillMaxWidth().padding(16.dp),
+                    modifier = Modifier.fillMaxWidth().padding(16.dp).heightIn(max = 500.dp),
                     shape = RoundedCornerShape(16.dp),
                     colors = CardDefaults.cardColors(
                         containerColor = MaterialTheme.colorScheme.surface,
@@ -1348,14 +1357,26 @@ fun ScoringInterface(
                     )
                 ) {
                     Column(
-                        modifier = Modifier.padding(16.dp),
+                        modifier = Modifier
+                            .padding(16.dp)
+                            .verticalScroll(rememberScrollState()),
                         verticalArrangement = Arrangement.spacedBy(10.dp),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         Text("🏷️ BYES LOGGER", fontWeight = FontWeight.Black, fontSize = 16.sp, color = Color(0xFF7B1FA2))
                         Text("Select how many byes were run by the batsmen:", fontSize = 12.sp, color = Color.Gray, textAlign = TextAlign.Center)
 
-                        (1..4).forEach { runs ->
+                        val choices = listOf(
+                            "0 runs (No runs taken)" to 0,
+                            "1 Bye" to 1,
+                            "2 Byes" to 2,
+                            "3 Byes" to 3,
+                            "4 Byes (FOUR!)" to 4,
+                            "5 Byes" to 5,
+                            "6 Byes (SIXR!)" to 6
+                        )
+
+                        choices.forEach { (label, runs) ->
                             Button(
                                 onClick = {
                                     onBallEntered(runs, "bye")
@@ -1365,7 +1386,7 @@ fun ScoringInterface(
                                 modifier = Modifier.fillMaxWidth(),
                                 shape = RoundedCornerShape(8.dp)
                             ) {
-                                Text("$runs ${if (runs == 1) "Bye" else "Byes"}", color = Color.White, fontWeight = FontWeight.Bold)
+                                Text(label, color = Color.White, fontWeight = FontWeight.Bold)
                             }
                         }
 
@@ -1380,7 +1401,7 @@ fun ScoringInterface(
         if (showLegByeDialog) {
             Dialog(onDismissRequest = { showLegByeDialog = false }) {
                 Card(
-                    modifier = Modifier.fillMaxWidth().padding(16.dp),
+                    modifier = Modifier.fillMaxWidth().padding(16.dp).heightIn(max = 500.dp),
                     shape = RoundedCornerShape(16.dp),
                     colors = CardDefaults.cardColors(
                         containerColor = MaterialTheme.colorScheme.surface,
@@ -1388,14 +1409,26 @@ fun ScoringInterface(
                     )
                 ) {
                     Column(
-                        modifier = Modifier.padding(16.dp),
+                        modifier = Modifier
+                            .padding(16.dp)
+                            .verticalScroll(rememberScrollState()),
                         verticalArrangement = Arrangement.spacedBy(10.dp),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         Text("🏃 LEG BYES LOGGER", fontWeight = FontWeight.Black, fontSize = 16.sp, color = Color(0xFF7B1FA2))
                         Text("Select how many leg byes were run by the batsmen:", fontSize = 12.sp, color = Color.Gray, textAlign = TextAlign.Center)
 
-                        (1..4).forEach { runs ->
+                        val choices = listOf(
+                            "0 runs (No runs taken)" to 0,
+                            "1 Leg Bye" to 1,
+                            "2 Leg Byes" to 2,
+                            "3 Leg Byes" to 3,
+                            "4 Leg Byes (FOUR!)" to 4,
+                            "5 Leg Byes" to 5,
+                            "6 Leg Byes (SIXR!)" to 6
+                        )
+
+                        choices.forEach { (label, runs) ->
                             Button(
                                 onClick = {
                                     onBallEntered(runs, "legbye")
@@ -1405,7 +1438,7 @@ fun ScoringInterface(
                                 modifier = Modifier.fillMaxWidth(),
                                 shape = RoundedCornerShape(8.dp)
                             ) {
-                                Text("$runs ${if (runs == 1) "Leg Bye" else "Leg Byes"}", color = Color.White, fontWeight = FontWeight.Bold)
+                                Text(label, color = Color.White, fontWeight = FontWeight.Bold)
                             }
                         }
 
@@ -1574,7 +1607,7 @@ fun WicketBottomSheetDialog(
                     Box {
                         val selectedName = availableNextBatsmen.find { it.id == selectedNextId }?.name ?: "Choose Batsman"
                         OutlinedButton(onClick = { expanded = true }, modifier = Modifier.fillMaxWidth()) {
-                            Text(selectedName, color = Color.Black)
+                            Text(selectedName, color = MaterialTheme.colorScheme.onSurface)
                         }
                         DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
                             availableNextBatsmen.forEach { p ->
@@ -1621,6 +1654,11 @@ fun BowlerPickerDialog(
     onSelect: (Int) -> Unit,
     onDismiss: () -> Unit
 ) {
+    val isDark = isSystemInDarkTheme()
+    val bowlerCardBg = if (isDark) Color(0xFF1E2D24) else Color(0xFFF4F9F5)
+    val bowlerCardText = if (isDark) Color(0xFFC8E6C9) else Color(0xFF0D1F13)
+    val bowlerLabelColor = if (isDark) Color(0xFF81C784) else Color(0xFF1A5C2E)
+
     Dialog(onDismissRequest = onDismiss) {
         Card(
             modifier = Modifier
@@ -1640,7 +1678,7 @@ fun BowlerPickerDialog(
                     text = "🏏 SELECT NEXT OVER BOWLER",
                     fontWeight = FontWeight.Black,
                     fontSize = 16.sp,
-                    color = Color(0xFF1A5C2E)
+                    color = bowlerLabelColor
                 )
                 Text(
                     text = "Rule: Consecutive overs cannot be bowled by the same bowler.",
@@ -1658,16 +1696,19 @@ fun BowlerPickerDialog(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .clickable { onSelect(p.id) },
-                            colors = CardDefaults.cardColors(containerColor = Color(0xFFF4F9F5)),
-                            border = BorderStroke(1.dp, Color.LightGray)
+                            colors = CardDefaults.cardColors(
+                                containerColor = bowlerCardBg,
+                                contentColor = bowlerCardText
+                            ),
+                            border = BorderStroke(1.dp, if (isDark) Color(0xFF2E3F34) else Color.LightGray)
                         ) {
                             Row(
                                 modifier = Modifier.padding(12.dp),
                                 horizontalArrangement = Arrangement.SpaceBetween,
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
-                                Text("#${p.jerseyNumber} ${p.name}", fontWeight = FontWeight.Bold)
-                                Text("Assign ➔", color = Color(0xFF1A5C2E), fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                                Text("#${p.jerseyNumber} ${p.name}", color = bowlerCardText, fontWeight = FontWeight.Bold)
+                                Text("Assign ➔", color = bowlerLabelColor, fontSize = 12.sp, fontWeight = FontWeight.Bold)
                             }
                         }
                     }

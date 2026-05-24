@@ -9,10 +9,12 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -406,6 +408,157 @@ fun ScorecardScreen(
                         }
                     }
 
+                    // INTERACTIVE TIMELINE AND FILTER CHIPS
+                    item {
+                        var activeFilter by remember { mutableStateOf("All") }
+
+                        val filteredBalls = remember(inningsBalls, activeFilter) {
+                            when (activeFilter) {
+                                "Zeros Color 0" -> inningsBalls.filter { it.runs == 0 && !it.isWicket && it.extraType.isEmpty() }
+                                "Ones Click 1" -> inningsBalls.filter { it.runs == 1 && it.extraType.isEmpty() }
+                                "Twos Click 2" -> inningsBalls.filter { it.runs == 2 && it.extraType.isEmpty() }
+                                "Threes Click 3" -> inningsBalls.filter { it.runs == 3 && it.extraType.isEmpty() }
+                                "Fours Click 4" -> inningsBalls.filter { it.runs == 4 && it.extraType.isEmpty() }
+                                "Sixes Click 6" -> inningsBalls.filter { it.runs == 6 && it.extraType.isEmpty() }
+                                "Wickets Out" -> inningsBalls.filter { it.isWicket }
+                                "Wides (Extra)" -> inningsBalls.filter { it.extraType == "wide" }
+                                "No Balls (Extra)" -> inningsBalls.filter { it.extraType == "noball" }
+                                "Byes (Extra)" -> inningsBalls.filter { it.extraType == "bye" || it.extraType == "legbye" }
+                                else -> inningsBalls
+                            }
+                        }
+
+                        Card(
+                            modifier = Modifier.fillMaxWidth(),
+                            colors = CardDefaults.cardColors(
+                                containerColor = themeCardBg,
+                                contentColor = themeTextPrimary
+                            ),
+                            border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.15f)),
+                            shape = RoundedCornerShape(10.dp)
+                        ) {
+                            Column(modifier = Modifier.padding(12.dp)) {
+                                Text(
+                                    text = "🔍 INTERACTIVE BALL TIMELINE FILTER",
+                                    fontWeight = FontWeight.Black,
+                                    fontSize = 12.sp,
+                                    color = themeHeadingGreen,
+                                    letterSpacing = 1.sp
+                                )
+                                Spacer(modifier = Modifier.height(8.dp))
+
+                                // Scrollable Row of Filter Buttons
+                                val filters = listOf(
+                                    "All" to "All",
+                                    "Zeros" to "Zeros Color 0",
+                                    "Ones" to "Ones Click 1",
+                                    "Twos" to "Twos Click 2",
+                                    "Threes" to "Threes Click 3",
+                                    "Fours" to "Fours Click 4",
+                                    "Sixes" to "Sixes Click 6",
+                                    "Wickets" to "Wickets Out",
+                                    "Wides" to "Wides (Extra)",
+                                    "No-Balls" to "No Balls (Extra)",
+                                    "Byes" to "Byes (Extra)"
+                                )
+
+                                LazyRow(
+                                    horizontalArrangement = Arrangement.spacedBy(6.dp),
+                                    modifier = Modifier.fillMaxWidth()
+                                ) {
+                                    items(filters) { (label, filtKey) ->
+                                        val isSelected = activeFilter == filtKey
+                                        val btnColor = if (isSelected) themeHeadingGreen else themeHeaderBg
+                                        val textColor = if (isSelected) Color.White else themeHeaderText
+
+                                        Box(
+                                            modifier = Modifier
+                                                .clip(RoundedCornerShape(6.dp))
+                                                .background(btnColor)
+                                                .clickable { activeFilter = filtKey }
+                                                .padding(horizontal = 10.dp, vertical = 6.dp)
+                                        ) {
+                                            Text(
+                                                text = label,
+                                                fontSize = 11.sp,
+                                                fontWeight = FontWeight.Bold,
+                                                color = textColor
+                                            )
+                                        }
+                                    }
+                                }
+
+                                Spacer(modifier = Modifier.height(10.dp))
+
+                                // Display count
+                                Text(
+                                    text = "Showing ${filteredBalls.size} deliveries",
+                                    fontSize = 11.sp,
+                                    color = Color.Gray,
+                                    fontWeight = FontWeight.Bold
+                                )
+
+                                Spacer(modifier = Modifier.height(8.dp))
+
+                                // Scrollable Row of individual deliveries matching
+                                if (filteredBalls.isEmpty()) {
+                                    Text(
+                                        text = "No deliveries match this filter.",
+                                        fontSize = 12.sp,
+                                        color = Color.Gray,
+                                        modifier = Modifier.padding(vertical = 8.dp)
+                                    )
+                                } else {
+                                    LazyRow(
+                                        horizontalArrangement = Arrangement.spacedBy(10.dp),
+                                        modifier = Modifier.fillMaxWidth()
+                                    ) {
+                                        items(filteredBalls) { ball ->
+                                            Column(
+                                                horizontalAlignment = Alignment.CenterHorizontally,
+                                                verticalArrangement = Arrangement.spacedBy(4.dp),
+                                                modifier = Modifier.padding(vertical = 4.dp)
+                                            ) {
+                                                // Short name of batsman and bowler
+                                                val batsmanInitial = players.find { it.id == ball.batsmanId }?.name?.split(" ")?.lastOrNull()?.take(5) ?: "Bat"
+                                                val bowlerInitial = players.find { it.id == ball.bowlerId }?.name?.split(" ")?.lastOrNull()?.take(5) ?: "Bowl"
+
+                                                Text(
+                                                    text = "${ball.overNumber}.${(ball.ballNumber - 1) % 6 + 1}",
+                                                    fontSize = 9.sp,
+                                                    color = Color.Gray,
+                                                    fontWeight = FontWeight.Bold
+                                                )
+
+                                                Box(
+                                                    modifier = Modifier
+                                                        .size(36.dp)
+                                                        .clip(RoundedCornerShape(18.dp))
+                                                        .background(getBallColorForScorecard(ball)),
+                                                    contentAlignment = Alignment.Center
+                                                ) {
+                                                    Text(
+                                                        text = getBallTextForScorecard(ball),
+                                                        fontSize = 11.sp,
+                                                        color = Color.White,
+                                                        fontWeight = FontWeight.Black
+                                                    )
+                                                }
+
+                                                Text(
+                                                    text = "$batsmanInitial v $bowlerInitial",
+                                                    fontSize = 8.sp,
+                                                    color = themeTextPrimary.copy(alpha = 0.7f),
+                                                    fontWeight = FontWeight.Medium
+                                                )
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+
                     // MANHATTAN CHART
                     item {
                         Column(modifier = Modifier.fillMaxWidth().background(themeCardBg).border(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.15f), RoundedCornerShape(8.dp)).padding(12.dp)) {
@@ -648,4 +801,33 @@ fun compileScorecardText(
 
     builder.append("\n_Created offline via Samarbagh Junior League scorer app_ ⛰️")
     return builder.toString()
+}
+
+private fun getBallTextForScorecard(ball: Ball): String {
+    return if (ball.isWicket) "W" else {
+        when (ball.extraType) {
+            "wide" -> if (ball.extras > 1) "${ball.extras - 1}+Wd" else "Wd"
+            "noball" -> if (ball.runs > 0) "${ball.runs}+Nb" else "Nb"
+            "bye" -> if (ball.extras > 0) "${ball.extras}B" else "B"
+            "legbye" -> if (ball.extras > 0) "${ball.extras}Lb" else "Lb"
+            else -> ball.runs.toString()
+        }
+    }
+}
+
+private fun getBallColorForScorecard(ball: Ball): Color {
+    return if (ball.isWicket) Color(0xFFD32F2F) else {
+        when (ball.extraType) {
+            "wide", "noball" -> Color(0xFF1976D2)
+            "bye", "legbye" -> Color(0xFF7B1FA2)
+            else -> {
+                when (ball.runs) {
+                    4 -> Color(0xFFD4A017)
+                    6 -> Color(0xFF6A1B9A) // elegant distinct deep purple / gold for sixes!
+                    0 -> Color.Gray
+                    else -> Color(0xFF4CAF50)
+                }
+            }
+        }
+    }
 }
